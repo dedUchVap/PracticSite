@@ -132,7 +132,7 @@ python manage.py migrate
 
 ### 📄 Мои покупки
 
-![Purchased Lands Page](screenshots/purchased.png)
+![Purchased Lands Page](screenshots/purchased.jpg)
 
 ---
 
