@@ -1,0 +1,18 @@
+.input_my {
+    margin-bottom: 10px;
+    background-color: white;
+    padding: 5px;
+    width: 100%; /* Обеспечиваем, что инпуты растягиваются на всю доступную ширину контейнера */
+    max-width: 100%; /* Чтобы инпуты не превышали ширину контейнера */
+    border-radius: 0.375rem;
+    border: 1px solid #ccc; /* Добавим границу для поля */
+}
+
+.input_my:focus {
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+}
+
+/* Сделаем отступы между элементами */
+form > div {
+    margin-bottom: 10px;
+}

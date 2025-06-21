@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center">Покупка земельных участков</h2>
+
+    <!-- Filter Section -->
+    <div class="row my-4">
+        <div class="col-md-3">
+            <h5>Фильтры</h5>
+            <form id="filter-form" action="{% url 'filter_lands' %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="size" class="form-label">Размер участка (м<sup>2</sup>)</label>
+                    <input type="number" id="size" name="size" class="form-control" placeholder="Минимальный размер">
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Местонахождение</label>
+                    <input type="text" id="location" name="location" class="form-control"
+                           placeholder="Город или область">
+                </div>
+                <div class="mb-3">
+                    <label for="type" class="form-label">Тип земли</label>
+                    <select id="type" name="type" class="form-select">
+                        <option value="">Выберите тип</option>
+                        <option value="residential">Жилая</option>
+                        <option value="agricultural">Сельскохозяйственная</option>
+                        <option value="commercial">Коммерческая</option>
+                    </select>
+                </div>
+                <button type="submit" id="apply-filters" class="btn btn-primary w-100">Применить фильтры</button>
+            </form>
+        </div>
+
+        <!-- Land Listings -->
+        <div class="col-md-9">
+            <div class="row" id="land-list">
+                    <div id="lands-container" class="row">
+                        {% for land in lands %}
+                            <div class="card" style="width: 18rem;">
+                                <img src="{{ land.image.url }}" class="card-img-top" alt="Image of {{ land.title }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ land.title }}</h5>
+                                    <p class="card-text">Размер: {{ land.size }} м²</p>
+                                    <p class="card-text">Местоположение: {{ land.location }}</p>
+                                    <p class="card-text">Тип: {{ land.land_type }}</p>
+                                    <button class="btn btn-success purchase-button" data-id="{{ land.id }}"
+                                            id="purchase-button-{{ land.id }}">
+                                        Купить
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+       <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const filterForm = document.getElementById('filter-form');
+        const landsContainer = document.getElementById('lands-container');
+
+        // Добавление обработчиков к кнопкам "Купить"
+        function addPurchaseHandlers() {
+            document.querySelectorAll('.purchase-button').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const landId = button.getAttribute('data-id');
+                    const url = `/purchase/${landId}/`;
+
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken'),
+                            },
+                        });
+
+                        const data = await response.json();
+                        if (response.ok) {
+                            button.textContent = 'Куплено';
+                            button.classList.remove('btn-success');
+                            button.classList.add('btn-secondary');
+                            button.disabled = true;
+                            alert(data.message);
+                        } else {
+                            alert(data.error);
+                        }
+                    } catch (error) {
+                        console.error('Ошибка:', error);
+                        alert('Произошла ошибка при покупке. Попробуйте позже.');
+                    }
+                });
+            });
+        }
+
+        // Отправка запроса на фильтрацию
+        filterForm.addEventListener('submit', async (event) => {
+            console.log('работаем')
+            event.preventDefault();
+            const formData = new FormData(filterForm);
+            const url = filterForm.action;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    landsContainer.innerHTML = data.html;
+                    addPurchaseHandlers(); // Перепривязываем обработчики после фильтрации
+                } else {
+                    alert('Ошибка фильтрации. Попробуйте еще раз.');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при фильтрации. Попробуйте позже.');
+            }
+        });
+
+        // Инициализируем обработчики при загрузке страницы
+        addPurchaseHandlers();
+
+        // Функция для получения CSRF-токена
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+
+    </div>
+    </div>
+    </html>
+    {% endblock %}

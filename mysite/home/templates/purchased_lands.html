@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Купленные земельные участки</h2>
+    {% if orders %}
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ order.land.image.url }}" class="card-img-top" alt="Image of {{ order.land.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ order.land.title }}</h5>
+                            <p class="card-text">Размер: {{ order.land.size }} м²</p>
+                            <p class="card-text">Местоположение: {{ order.land.location }}</p>
+                            <p class="card-text">Тип: {{ order.land.land_type }}</p>
+                            <p class="card-text"><strong>Дата покупки:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Вы еще не купили ни одного участка.</p>
+    {% endif %}
+</div>
+{% endblock %}

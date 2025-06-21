@@ -1,0 +1,16 @@
+{% for land in lands %}
+    <div class="col-md-6 mb-4">
+        <div class="card" style="width: 18rem;">
+            <img src="{{ land.image.url }}" class="card-img-top" alt="Image of {{ land.title }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ land.title }}</h5>
+                <p class="card-text">Размер: {{ land.size }} м²</p>
+                <p class="card-text">Местоположение: {{ land.location }}</p>
+                <p class="card-text">Тип: {{ land.land_type }}</p>
+                <button class="btn btn-success purchase-button" data-id="{{ land.id }}" id="purchase-button-{{ land.id }}">
+                    Купить
+                </button>
+            </div>
+        </div>
+    </div>
+{% endfor %}

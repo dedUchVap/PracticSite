@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+    <h2>Страница регистрации</h2>
+    <form method="post" style="flex-direction: column; margin: 10px; display: flex; justify-content: center; align-items: center; gap: 10px; max-width: 800px; width: 100%;">
+        {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+        <div class="container_my" style="width: 100%; max-width: 100%;">
+            {% csrf_token %}
+            <div style="align-self: start">
+                <label for="id_username">Имя пользователя</label>
+            </div>
+            {{ form.username }}
+
+            <div style="align-self: start">
+                <label for="id_password1">Пароль</label>
+            </div>
+            {{ form.password1 }}
+
+            <div style="align-self: start">
+                <label for="id_password2">Повторите пароль</label>
+            </div>
+            {{ form.password2 }}
+
+            <button type="submit" class="btn btn-success mt-3">Зарегистрироваться</button>
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}
