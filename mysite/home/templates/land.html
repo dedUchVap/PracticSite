@@ -1,21 +1,79 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    h2.text-center {
+        color: #1e1e2f;
+        font-weight: 700;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin: 1rem;
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-img-top {
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+        color: #1e1e2f;
+        font-weight: 600;
+    }
+
+    .card-text {
+        font-size: 0.95rem;
+        color: #555;
+    }
+
+    #filter-form {
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    #apply-filters {
+        background-color: #00d1b2;
+        border: none;
+    }
+
+    #apply-filters:hover {
+        background-color: #00b89c;
+    }
+
+    .purchase-button {
+        width: 100%;
+    }
+</style>
+
 <div class="container my-5">
     <h2 class="text-center">Покупка земельных участков</h2>
 
-    <!-- Filter Section -->
     <div class="row my-4">
+        <!-- Filters -->
         <div class="col-md-3">
-            <h5>Фильтры</h5>
+            <h5 class="mb-3">🔍 Фильтры</h5>
             <form id="filter-form" action="{% url 'filter_lands' %}" method="post">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <label for="size" class="form-label">Размер участка (м<sup>2</sup>)</label>
+                    <label for="size" class="form-label">Размер участка (м²)</label>
                     <input type="number" id="size" name="size" class="form-control" placeholder="Минимальный размер">
                 </div>
                 <div class="mb-3">
-                    <label for="location" class="form-label">Местонахождение</label>
+                    <label for="location" class="form-label">Местоположение</label>
                     <input type="text" id="location" name="location" class="form-control"
                            placeholder="Город или область">
                 </div>
@@ -32,40 +90,36 @@
             </form>
         </div>
 
-        <!-- Land Listings -->
+        <!-- Listings -->
         <div class="col-md-9">
-            <div class="row" id="land-list">
-                    <div id="lands-container" class="row">
-                        {% for land in lands %}
-                            <div class="card" style="width: 18rem;">
-                                <img src="{{ land.image.url }}" class="card-img-top" alt="Image of {{ land.title }}">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ land.title }}</h5>
-                                    <p class="card-text">Размер: {{ land.size }} м²</p>
-                                    <p class="card-text">Местоположение: {{ land.location }}</p>
-                                    <p class="card-text">Тип: {{ land.land_type }}</p>
-                                    <button class="btn btn-success purchase-button" data-id="{{ land.id }}"
-                                            id="purchase-button-{{ land.id }}">
-                                        Купить
-                                    </button>
-                                </div>
-                            </div>
+            <div id="lands-container" class="row">
+                {% for land in lands %}
+                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                    <div class="card">
+                        <img src="{{ land.image.url }}" class="card-img-top" alt="Image of {{ land.title }}">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ land.title }}</h5>
+                            <p class="card-text">Размер: {{ land.size }} м²</p>
+                            <p class="card-text">Местоположение: {{ land.location }}</p>
+                            <p class="card-text">Тип: {{ land.land_type }}</p>
+                            <button class="btn btn-success mt-auto purchase-button" data-id="{{ land.id }}"
+                                    id="purchase-button-{{ land.id }}">
+                                Купить
+                            </button>
                         </div>
-                        {% endfor %}
                     </div>
-
                 </div>
+                {% endfor %}
             </div>
         </div>
+    </div>
+</div>
 
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-       <script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
         const filterForm = document.getElementById('filter-form');
         const landsContainer = document.getElementById('lands-container');
 
-        // Добавление обработчиков к кнопкам "Купить"
         function addPurchaseHandlers() {
             document.querySelectorAll('.purchase-button').forEach(button => {
                 button.addEventListener('click', async () => {
@@ -98,9 +152,7 @@
             });
         }
 
-        // Отправка запроса на фильтрацию
         filterForm.addEventListener('submit', async (event) => {
-            console.log('работаем')
             event.preventDefault();
             const formData = new FormData(filterForm);
             const url = filterForm.action;
@@ -117,7 +169,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     landsContainer.innerHTML = data.html;
-                    addPurchaseHandlers(); // Перепривязываем обработчики после фильтрации
+                    addPurchaseHandlers();
                 } else {
                     alert('Ошибка фильтрации. Попробуйте еще раз.');
                 }
@@ -127,10 +179,8 @@
             }
         });
 
-        // Инициализируем обработчики при загрузке страницы
         addPurchaseHandlers();
 
-        // Функция для получения CSRF-токена
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -147,8 +197,4 @@
         }
     });
 </script>
-
-    </div>
-    </div>
-    </html>
-    {% endblock %}
+{% endblock %}
